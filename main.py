@@ -1,9 +1,14 @@
 ﻿import cv2
 from PIL import ImageGrab
 import numpy as np
+import time
+from directKeys import PressKey,W,A,S,D
 
 
+last_time = time.time()
 while True:
+
+   PressKey(W)
 
    kernel = np.ones((15 , 15) , np.float32)/225
    get_screen = ImageGrab.grab(bbox=(10,10,1280,720))
@@ -23,6 +28,11 @@ while True:
 
    
    resized = cv2.resize(output , (640 , 480))
+   
+   print('loop took {} seconds'.format(time.time()-last_time))
+   last_time = time.time()
+   
+   
    cv2.imshow('manipulated' , resized)
    
    if cv2.waitKey(1) & 0xFF == ord('q'):
