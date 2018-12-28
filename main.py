@@ -3,10 +3,23 @@ from PIL import ImageGrab
 import numpy as np
 import time
 from directKeys import PressKey,W,A,S,D
+from getKeys import key_check
+
+def keys_to_output(keys):
+    output = [0,0,0]
+    
+    if 'A' in keys:
+        output[0] = 1
+    elif 'D' in keys:
+        output[2] = 1
+    else:
+        output[1] = 1
+    return output
 
 
 last_time = time.time()
-while True:
+def main():
+  while True:
 
    PressKey(W)
 
