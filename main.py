@@ -4,6 +4,7 @@ import numpy as np
 import time
 from directKeys import PressKey,W,A,S,D
 from getKeys import key_check
+import os
 
 def keys_to_output(keys):
     output = [0,0,0]
@@ -16,12 +17,19 @@ def keys_to_output(keys):
         output[1] = 1
     return output
 
-
+file_name = "training_data.npy"
+if os.path.isfile(file_name):
+   print("file exists , loading previous data!")
+   training_data = list(np.load(file_name))
+else:
+   print("file does not exist , starting fresh")
+   training_data = []   
+    
 last_time = time.time()
-def main():
-  while True:
 
-   PressKey(W)
+
+while True:
+
 
    kernel = np.ones((15 , 15) , np.float32)/225
    get_screen = ImageGrab.grab(bbox=(10,10,1280,720))
@@ -47,9 +55,15 @@ def main():
    
    
    cv2.imshow('manipulated' , resized)
+   screen_output = cv2.resize(output , (32 ,32))
+   keys = key_check()
+   Keys_output = keys_to_output(keys)
+   training_data.append([screen_output,Keys_output])   
    
    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
         break   
-
-cv2.destroyAllWindows()
-  
+    
+   if len(training_data) % 500 == 0:
+       print(len(training_data))
+       np.save(file_name,training_data)   
