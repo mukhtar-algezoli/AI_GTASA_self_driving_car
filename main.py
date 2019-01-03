@@ -6,6 +6,7 @@ from directKeys import PressKey,W,A,S,D
 from getKeys import key_check
 import os
 
+
 def keys_to_output(keys):
     output = [0,0,0]
     
@@ -55,7 +56,7 @@ while True:
    
    
    cv2.imshow('manipulated' , resized)
-   screen_output = cv2.resize(output , (32 ,32))
+   screen_output = cv2.resize(output , (224 ,224))
    keys = key_check()
    Keys_output = keys_to_output(keys)
    training_data.append([screen_output,Keys_output])   
