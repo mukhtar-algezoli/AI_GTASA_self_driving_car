@@ -6,13 +6,25 @@ import torch.utils.data
 import numpy as np
 import torch
 from IPython.core.debugger import set_trace
+import os
+import visdomvisualize
+
+
+PATH = "savedmodel.tar"
+
 
 AlexNet = AlexNet()
 
 criterion = nn.MSELoss()
 optimizer = optim.SGD(AlexNet.parameters(), lr=0.001, momentum=0.9)
 
-all_data = np.load('training_data.npy')
+if os.path.exists("savedmodel.tar"):
+  checkpoint = torch.load(PATH)
+  AlexNet.load_state_dict(checkpoint['model_state_dict'])
+  optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+  print("checkpoint loaded")
+
+all_data = np.load('training_data2.npy')
 inputs= all_data[:,0]
 labels= all_data[:,1]
 inputs_tensors = torch.stack([torch.Tensor(i) for i in inputs])
@@ -31,9 +43,14 @@ data_loader = torch.utils.data.DataLoader(data_set, batch_size=3,shuffle=True, n
 
 
 if __name__ == '__main__':
- for epoch in range(2):
+ plot = visdomvisualize.Plot("Model A")
+ plot.register_line("Loss", "Epoch", "Loss")
+ for epoch in range(4):
+  size_of_data = 0.0
+  avgloss = 0.0
   runing_loss = 0.0
   for i,data in enumerate(data_loader , 0):
+     size_of_data = size_of_data + 1
      inputs= data[0]
      # inputs = torch.LongTensor(inputs)
      labels= data[1]
@@ -47,10 +64,17 @@ if __name__ == '__main__':
      print("Epoch:{0} , image:{1} , loss:{2} ".format(epoch , i , loss))
      loss.backward()
      optimizer.step()
-     
+     # plot.update_line("Loss", i + 1, loss.item())
+  
      runing_loss +=loss.item()
-     if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
+  avgloss = runing_loss/size_of_data
+  plot.update_line("Loss", epoch + 1, avgloss)
+  print("saving checkpoint")
+  torch.save({
+            'epoch': epoch,
+            'model_state_dict': AlexNet.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss
+            }, PATH)   
+            
  print('finished')

@@ -3,7 +3,7 @@ import pandas as pd
 from random import shuffle
 import cv2
 
-train_data = np.load('training_data.npy')
+train_data = np.load('training_data2.npy')
 
 shuffle(train_data)
 
