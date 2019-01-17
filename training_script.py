@@ -18,17 +18,20 @@ AlexNet = AlexNet()
 criterion = nn.MSELoss()
 optimizer = optim.SGD(AlexNet.parameters(), lr=0.001, momentum=0.9)
 
-if os.path.exists("savedmodel.tar"):
+if os.path.exists(PATH):
   checkpoint = torch.load(PATH)
   AlexNet.load_state_dict(checkpoint['model_state_dict'])
   optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+  AlexNet.train()
   print("checkpoint loaded")
 
-all_data = np.load('training_data2.npy')
+all_data = np.load('training_data3_v2.npy')
 inputs= all_data[:,0]
 labels= all_data[:,1]
 inputs_tensors = torch.stack([torch.Tensor(i) for i in inputs])
 labels_tensors = torch.stack([torch.Tensor(i) for i in labels])
+print(inputs_tensors.size())
+
 # transform = transforms.Compose([
     # # you can add other transformations in this list
     # transforms.ToTensor()
@@ -36,7 +39,7 @@ labels_tensors = torch.stack([torch.Tensor(i) for i in labels])
 # transformed_data = transform(all_data)
 # # data_set = torchvision.datasets.ImageFolder('training_data.npy' ,transform = transforms.ToTensor() )
 data_set = torch.utils.data.TensorDataset(inputs_tensors,labels_tensors)
-data_loader = torch.utils.data.DataLoader(data_set, batch_size=3,shuffle=True, num_workers=2)
+data_loader = torch.utils.data.DataLoader(data_set, batch_size=1,shuffle=True, num_workers=2)
 # training_data = all_data[:-500]lk
 # testing_data = all_data[-500:]
 
@@ -60,6 +63,11 @@ if __name__ == '__main__':
      inputs = torch.unsqueeze(inputs, 1)
      # set_trace()
      outputs = AlexNet(inputs)
+     _, predicted = torch.max(outputs, 1)
+     print(predicted.item())
+     print(inputs)
+     print(labels)
+     print(outputs)
      loss = criterion(outputs , labels)
      print("Epoch:{0} , image:{1} , loss:{2} ".format(epoch , i , loss))
      loss.backward()

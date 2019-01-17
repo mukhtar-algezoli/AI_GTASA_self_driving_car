@@ -8,17 +8,21 @@ import os
 
 
 def keys_to_output(keys):
-    output = [0,0,0]
-    
-    if 'A' in keys:
+    output = [0,0,0,0,0]
+
+    if ('D' in keys) & ('W' in keys):
+        output[3] = 1
+    elif ('A' in keys) & ('W' in keys):
+        output[4] = 1     
+    elif 'A' in keys:
         output[0] = 1
     elif 'D' in keys:
-        output[2] = 1
+        output[1] = 1   
     else:
-        output[1] = 1
+        output[2] = 1
     return output
 
-file_name = "training_data2.npy"
+file_name = "training_data3.npy"
 if os.path.isfile(file_name):
    print("file exists , loading previous data!")
    training_data = list(np.load(file_name))
